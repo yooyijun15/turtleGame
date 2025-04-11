@@ -164,10 +164,7 @@ class turtleGame():
                 break
             self.round_number += 1
         
-# (추가) 실행
+# 실행
 if __name__ == "__main__":
     game = turtleGame()
     game.run()
-
-
-
