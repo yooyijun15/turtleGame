@@ -27,6 +27,7 @@ class turtleGame:
         self.round_number = 1
         self.lives = INIT_LIVES
         self.score = 0
+        self.total_score = 0
         self.target_circle = TARGET_BASE
         self.total_rounds = TOTAL_ROUNDS
         self.round_time = ROUND_TIME
@@ -108,12 +109,16 @@ class turtleGame:
 
             self.pen.clear()
             self.pen.write(
-                f" ⫸ ROUND {self.round_number} ⫷    ⏱ {remaining_time}초    생명 : {self.get_heart_display()}    {self.score} / {goal_circle}",
+                f" ⫸ ROUND {self.round_number} ⫷    ⏱ {remaining_time}초    생명 : {self.get_heart_display()}     ⭐ {self.total_score}     {self.score} / {goal_circle}",
                 align="center", font=("Arial", 16, "bold")
             )
             self.screen.update()
 
-            if self.lives <= 0 or elapsed_time >= self.round_time or self.score >= goal_circle:
+            if self.lives <= 0 or elapsed_time >= self.round_time:
+                game_over = False
+
+            if self.score >= goal_circle:
+                self.total_score += remaining_time * self.round_number
                 game_over = False
 
         time.sleep(0.02)
@@ -132,6 +137,7 @@ class turtleGame:
             if retry and retry.lower() == "yes":
                 self.lives = INIT_LIVES
                 self.score = 0
+                self.total_score -= 3
                 self.pen.goto(0, 220)
                 self.setup_controls()
                 self.round_number -= 1
