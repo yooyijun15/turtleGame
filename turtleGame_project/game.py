@@ -2,6 +2,7 @@ from turtle import Turtle, Screen
 from random import randint
 import time
 from config import SCREEN_WIDTH, SCREEN_HEIGHT, INIT_LIVES, ROUND_TIME, TOTAL_ROUNDS, TARGET_BASE
+from rank import save_rank, draw_rank
 
 class turtleGame:
     def __init__(self):
@@ -137,7 +138,7 @@ class turtleGame:
             if retry and retry.lower() == "yes":
                 self.lives = INIT_LIVES
                 self.score = 0
-                self.total_score -= 3
+                self.total_score -= 3 * (self.round_number - 1)
                 self.pen.goto(0, 220)
                 self.setup_controls()
                 self.round_number -= 1
@@ -152,3 +153,9 @@ class turtleGame:
             if not result:
                 break
             self.round_number += 1
+
+        # 랭킹
+        name = self.screen.textinput("점수 기록", f"최종 점수: {self.total_score}점\n이름을 입력하세요:")
+        if name:
+            save_rank(name, self.total_score)
+            draw_rank(self.screen)
