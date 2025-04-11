@@ -1,4 +1,5 @@
 from turtle import Turtle, Screen
+from random import randint
 import time
 
 # Step 1. 화면 설정
@@ -75,6 +76,22 @@ def get_heart_display(lives):
     empty = "♡"
     return full * lives + empty * (3 - lives)
 
+# Step 7. 아이템 객체 생성 및 설정
+# Step 7-1. 아이템 생성 함수 정의
+def create_items(shape, color, count):
+    items = []
+    for _ in range(count):
+        item = Turtle()
+        item.shape(shape)
+        item.color(color)
+        item.penup()
+        item.speed(0)
+        x = randint(-250, 250)
+        y = randint(230, 250)
+        item.goto(x, y)
+        items.append(item)
+    return items
+
 # Step 6. 게임 루프 생성
 # Step 6-1. 변수 선언
 total_rounds = 5
@@ -86,10 +103,25 @@ while round_number <= total_rounds:
     # .time() : 현재 시간을 초 단위로 반환
     game_over = True
 
+    # Step 7-2. 아이템 객체 생성
+    enemy_triangles = create_items("triangle", "red", 5)
+
     while game_over:
         current_time = time.time()
         elapsed_time = current_time - start_time # 현재 시간 - 시작 시간 = 경과 시간
         remaining_time = max(0, int(round_time - elapsed_time)) + 1 # 남은 시간, 소수점 버리고 1초 보정
+
+        # Step 7-3. 아이템 객체 아래로 떨어트리기
+        for item in enemy_triangles:
+            y = item.ycor() - 5 # 숫자 클수록 속도 UP
+            item.sety(y)
+            # 바닥에 닿으면 랜덤 시작 위치로 이동
+            if y < -250:
+                item.goto(randint(-250, 250), randint(230, 250))
+            # 플레이어에 닿으면 1) 생명 하나 없애고, 2) 랜덤 시작 위치로 이동
+            if player.distance(item) < 20:
+                lives -= 1
+                item.goto(randint(-250, 250), randint(230, 250))
 
         # Step 5-3. 화면 정보 출력
         pen.clear()
@@ -106,6 +138,13 @@ while round_number <= total_rounds:
             
     time.sleep(0.02)
     # .sleep(초) : 일시정지
+    
+    # Step 7-4. 해당 라운드에서 생성된 아이템 객체 삭제
+    for item in enemy_triangles:
+        item.hideturtle()
+        item.clear()
+        del item # 메모리 정리
+        
     # Step 6-5. 다음 라운드 이동
     round_number += 1
          
