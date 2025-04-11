@@ -95,7 +95,7 @@ def create_items(shape, color, count):
 # Step 6. 게임 루프 생성
 # Step 6-1. 변수 선언
 total_rounds = 5
-round_time = 15
+round_time = 5
 
 # Step 6-2. 라운드 루프 시작
 while round_number <= total_rounds:
@@ -104,15 +104,17 @@ while round_number <= total_rounds:
     game_over = True
 
     # Step 7-2. 아이템 객체 생성
-    enemy_triangles = create_items("triangle", "red", 5)
+    enemy_triangles = create_items("triangle", "red", 4)
+    enemy_squares = create_items("square", "blue", 4)
+    score_circle = create_items("circle", "green", 4)
 
     while game_over:
         current_time = time.time()
         elapsed_time = current_time - start_time # 현재 시간 - 시작 시간 = 경과 시간
-        remaining_time = max(0, int(round_time - elapsed_time)) + 1 # 남은 시간, 소수점 버리고 1초 보정
+        remaining_time = max(0, round(round_time - elapsed_time)) # 남은 시간, round() 함수 사용하여 소수점 보정
 
         # Step 7-3. 아이템 객체 아래로 떨어트리기
-        for item in enemy_triangles:
+        for item in enemy_triangles+enemy_squares:
             y = item.ycor() - 5 # 숫자 클수록 속도 UP
             item.sety(y)
             # 바닥에 닿으면 랜덤 시작 위치로 이동
@@ -121,6 +123,16 @@ while round_number <= total_rounds:
             # 플레이어에 닿으면 1) 생명 하나 없애고, 2) 랜덤 시작 위치로 이동
             if player.distance(item) < 20:
                 lives -= 1
+                item.goto(randint(-250, 250), randint(230, 250))
+        for item in score_circle:
+            y = item.ycor() - 5 # 숫자 클수록 속도 UP
+            item.sety(y)
+            # 바닥에 닿으면 랜덤 시작 위치로 이동
+            if y < -250:
+                item.goto(randint(-250, 250), randint(230, 250))
+            # 플레이어에 닿으면 1) 점수 증가, 2) 랜덤 시작 위치로 이동
+            if player.distance(item) < 20:
+                score += 1
                 item.goto(randint(-250, 250), randint(230, 250))
 
         # Step 5-3. 화면 정보 출력
@@ -132,6 +144,11 @@ while round_number <= total_rounds:
         # Step 6-3. 화면 수동 업데이트
         screen.update()
 
+        # Step 8. 게임 종료 (생명 소진)
+        # Step 8-1. 하위 루프 종료
+        if lives <= 0:
+            game_over = False
+            
         # Step 6-4. 지정된 시간 경과 시, 루프 종료
         if elapsed_time >= round_time:
             game_over = False
@@ -140,13 +157,23 @@ while round_number <= total_rounds:
     # .sleep(초) : 일시정지
     
     # Step 7-4. 해당 라운드에서 생성된 아이템 객체 삭제
-    for item in enemy_triangles:
+    for item in enemy_triangles+enemy_squares+score_circle:
         item.hideturtle()
         item.clear()
         del item # 메모리 정리
         
+    # Step 8-2. 상위 루프 종료 및 Game Over 문구 표시 (생명 소진 or 점수 부족)
+    if lives <= 0 or score < target_circle:
+        pen.goto(0, 0) 
+        pen.write(f"💀 Game Over 💀", align="center", font=("Arial", 24, "bold"))
+        screen.update()
+        break
+        
     # Step 6-5. 다음 라운드 이동
     round_number += 1
+
+    # Step 7-5. 점수 초기화
+    score = 0
          
 # Step 1-2. 화면 클릭 시 종료
 screen.exitonclick()
