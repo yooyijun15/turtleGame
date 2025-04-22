@@ -2,10 +2,16 @@ from turtle import Turtle, Screen
 from random import randint
 import time
 from config import SCREEN_WIDTH, SCREEN_HEIGHT, INIT_LIVES, ROUND_TIME, TOTAL_ROUNDS, TARGET_BASE
-from rank import save_rank, draw_rank
+from rank_db import init_db, save_rank, draw_rank
+#from rank import save_rank, draw_rank
+#import pygame
 
 class turtleGame:
     def __init__(self):
+        #pygame.mixer.init()
+        #self.bgm = pygame.mixer.Sound("bgm.wav")
+        #self.bgm.set_volume(0.3)
+
         self.screen = Screen()
         self.screen.title("거북이🐢 게임")
         self.screen.bgcolor("black")
@@ -34,6 +40,7 @@ class turtleGame:
         self.round_time = ROUND_TIME
 
         self.setup_controls()
+        #self.bgm.play(-1)
 
     def setup_controls(self):
         self.screen.listen()
@@ -159,3 +166,5 @@ class turtleGame:
         if name:
             save_rank(name, self.total_score)
             draw_rank(self.screen)
+
+init_db()
